@@ -44,10 +44,10 @@ public class ClubMember extends BaseEntity {
     @Column
     private String memberName;
 
-    @Column(nullable = false)
+    @Column
     private boolean isEmailPublic;
 
-    @Column(nullable = false)
+    @Column
     private boolean isPhonePublic;
 
     @Column(nullable = false)

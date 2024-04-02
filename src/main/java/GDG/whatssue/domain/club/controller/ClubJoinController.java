@@ -5,11 +5,14 @@ import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
 import GDG.whatssue.domain.club.dto.GetJoinRequestsResponse;
 import GDG.whatssue.domain.club.service.ClubJoinService;
 import GDG.whatssue.domain.club.service.MemberJoinService;
+import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +42,7 @@ public class ClubJoinController {
 
     @Operation(summary = "모임가입 신청")
     @PostMapping("/join-requests")
-    public ResponseEntity joinClub(@Valid @RequestBody ClubJoinRequestDto requestDto) {
-        //현재 로그인 id parameter로 받아오기 & 예외처리 TODO
-        Long userId = 1L;
+    public ResponseEntity joinClub(@Valid @RequestBody ClubJoinRequestDto requestDto, @LoginUser Long userId) {
 
         //validation 예외처리 TODO
         clubJoinService.joinClub(userId, requestDto);
@@ -51,16 +52,14 @@ public class ClubJoinController {
 
     @Operation(summary = "모임가입 신청내역 조회")
     @GetMapping("/join-requests")
-    public ResponseEntity getJoinRequests() {
-        //현재 로그인 id parameter로 받아오기 & 예외처리 TODO
-        Long userId = 1L;
-
+    public ResponseEntity getJoinRequests(@LoginUser Long userId) {
         List<GetJoinRequestsResponse> responseDto = clubJoinService.getJoinRequests(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 
     }
 
+    @ClubManager
     @Operation(summary="멤버 가입요청 수락")
     @PostMapping("/clubs/{clubId}/join-requests/{clubJoinRequestId}/accept")
     public ResponseEntity acceptClubJoinRequest(@PathVariable Long clubJoinRequestId){
@@ -69,6 +68,7 @@ public class ClubJoinController {
         return ResponseEntity.status(200).body("가입 신청 수락 완료");
     }
 
+    @ClubManager
     @Operation(summary="멤버 가입요청 거절")
     @PostMapping("/clubs/{clubId}/join-requests/{clubJoinRequestId}/deny")
     public ResponseEntity denyClubJoinRequest(@PathVariable Long clubJoinRequestId){
@@ -77,6 +77,7 @@ public class ClubJoinController {
         return ResponseEntity.status(200).body("가입 신청 거절 완료");
     }
 
+    @ClubManager
     @Operation(summary = "멤버 가입요청 목록 조회")
     @GetMapping("/clubs/{clubId}/join-requests")
     public ResponseEntity<List<ClubJoinRequestGetDto>> getClubJoinRequest(@PathVariable Long clubId){

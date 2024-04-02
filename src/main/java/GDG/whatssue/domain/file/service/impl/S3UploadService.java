@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class S3UploadService implements FileUploadService {
 
-    private static String PATH = "https://whatssue.s3.ap-northeast-2.amazonaws.com/";
+    public static String PATH = "https://whatssue.s3.ap-northeast-2.amazonaws.com/";
 
     //S3Config에서 Bean으로 등록한 AmazonS3Client
     private final AmazonS3 amazonS3;

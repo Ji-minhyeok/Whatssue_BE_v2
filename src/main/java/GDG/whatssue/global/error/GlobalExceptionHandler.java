@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     //valid 검증 예외처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResult> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request){
-        log.warn("exception=", e.getMessage());
+        log.warn("exception= {}", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
         ErrorCode errorCode = CommonErrorCode.BAD_REQUEST;
 

@@ -12,6 +12,7 @@ import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
+import GDG.whatssue.domain.file.service.impl.S3UploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
@@ -31,7 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubServiceImpl implements ClubService {
 
     private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
-    private static String DEFAULT_PROFILE_IMAGE = PROFILE_IMAGE_DIRNAME + "/default.png";
+
+    //주소 앞에 s3 의존관계 없애야함 TODO
+    private static String DEFAULT_PROFILE_IMAGE =  "https://whatssue.s3.ap-northeast-2.amazonaws.com/" + PROFILE_IMAGE_DIRNAME + "/default.png";
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
     private final ClubMemberRepository clubMemberRepository;
@@ -46,16 +49,12 @@ public class ClubServiceImpl implements ClubService {
         }
 
         List<GetJoinClubListResponse> responseList = clubMembers.stream()
-            .map(c -> GetJoinClubListResponse.builder()
-                .clubId(c.getClub().getId())
-                .clubName(c.getClub().getClubName())
-                .profileImage(c.getClub().getProfileImage().getStoreFileName())
-                .createdAt(c.getCreateAt())
-                .role(c.getRole()).build())
+            .map(c -> entityToJoinClubListResponse(c))
             .collect(Collectors.toList());
 
         return responseList;
     }
+
     @Override
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
         //초대코드 추가하여 클럽 생성
@@ -80,8 +79,7 @@ public class ClubServiceImpl implements ClubService {
 
     @Override
     public void updateClubInfo(Long clubId, UpdateClubInfoRequest requestDto, MultipartFile profileImage) throws IOException {
-        Club club = clubRepository.findById(clubId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+        Club club = getClub(clubId);
 
         club.updateClubInfo(requestDto);
         clubRepository.save(club);
@@ -98,16 +96,14 @@ public class ClubServiceImpl implements ClubService {
     @Override
     @Transactional
     public void updateClubPrivateStatus(Long clubId) {
-        Club club = clubRepository.findById(clubId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+        Club club = getClub(clubId);
 
         club.updateIsPrivate();
     }
 
     @Override
     public GetClubInfoResponse getClubInfo(Long clubId) {
-        Club club = clubRepository.findById(clubId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+        Club club = getClub(clubId);
 
         String storeFileName = "";
         UploadFile profileImage = club.getProfileImage();
@@ -132,17 +128,53 @@ public class ClubServiceImpl implements ClubService {
             .isPrivate(club.isPrivate()).build();
     }
 
+    public GetJoinClubListResponse entityToJoinClubListResponse(ClubMember clubMember) {
+        Club club = clubMember.getClub();
+
+        String storeFileName = "";
+        UploadFile profileImage = club.getProfileImage();
+
+        if (profileImage != null) {
+            storeFileName = profileImage.getStoreFileName();
+        }
+
+        if (profileImage == null) {
+            storeFileName = DEFAULT_PROFILE_IMAGE;
+        }
+
+        String fullPath = fileUploadService.getFullPath(storeFileName);
+
+        return GetJoinClubListResponse.builder()
+            .clubId(club.getId())
+            .clubName(club.getClubName())
+            .profileImage(storeFileName)
+            .createdAt(clubMember.getCreateAt())
+            .role(clubMember.getRole()).build();
+
+    }
+
+
     @Override
     @Transactional
     public void updateClubCode(Long clubId) {
-        Club club = clubRepository.findById(clubId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+        Club club = getClub(clubId);
 
         club.createNewPrivateCode();
     }
 
+    @Override
+    public boolean isClubExist(Long clubId) {
+        Club club = clubRepository.findById(clubId).orElse(null);
+
+        if (club == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Transactional
-    private void saveProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
+    public void saveProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
         String originalFileName = profileImage.getOriginalFilename();
         //profileImage fileRepository 및 s3에 저장 처리
         String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
@@ -153,16 +185,21 @@ public class ClubServiceImpl implements ClubService {
             .storeFileName(storeFileName).build());
     }
 
-    private void deleteProfileImage(Club club) {
+    public void deleteProfileImage(Club club) {
         fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
         fileRepository.deleteById(club.getProfileImage().getId()); //레포에서 삭제
     }
 
-    private Club createDtoToClubEntity(ClubCreateRequest requestDto) {
+    public Club createDtoToClubEntity(ClubCreateRequest requestDto) {
         Club club = requestDto.toEntity();
         club.createNewPrivateCode();
 
         return club;
+    }
+
+    public Club getClub(Long clubId) {
+        return clubRepository.findById(clubId).orElseThrow(()
+            -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
     }
 }
 

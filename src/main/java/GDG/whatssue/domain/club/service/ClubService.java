@@ -19,5 +19,6 @@ public interface ClubService {
     public void updateClubPrivateStatus(Long clubId);
     public GetClubInfoResponse getClubInfo(Long clubId);
     public List<GetJoinClubListResponse> getJoinClubList(Long userId);
+    public boolean isClubExist(Long clubId);
 
 }

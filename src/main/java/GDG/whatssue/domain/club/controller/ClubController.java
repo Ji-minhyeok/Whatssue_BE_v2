@@ -6,6 +6,9 @@ import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.GetJoinClubListResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
+import GDG.whatssue.domain.user.entity.KakaoDetails;
+import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,10 +47,7 @@ public class ClubController {
     
     @Operation(summary = "가입한 모임 조회")
     @GetMapping
-    public ResponseEntity getJoinClubList() {
-        //user id 받아오기 & 예외처리 TODO
-        long userId = 1L;
-
+    public ResponseEntity getJoinClubList(@LoginUser Long userId) {
         List<GetJoinClubListResponse> responseDto = clubService.getJoinClubList(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -55,11 +56,9 @@ public class ClubController {
     @Operation(summary = "모임 생성")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
+        @LoginUser Long userId,
         @RequestPart("request") ClubCreateRequest request,
         @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
-
-        //user id 받아오기 & 예외처리 TODO
-        long userId = 1L;
 
         //Validation 및 예외처리 TODO
 
@@ -68,8 +67,8 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @Operation(summary = "모임 정보 수정",
-        description = "최종 프로필 사진이 기본 사진일 시 profileImage 헤더 x")
+    @ClubManager
+    @Operation(summary = "모임 정보 수정", description = "최종 프로필 사진이 기본 사진일 시 profileImage 헤더 x")
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,
@@ -81,6 +80,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @ClubManager
     @Operation(summary = "초대코드 갱신")
     @PatchMapping("/{clubId}/private-code")
     public ResponseEntity updateClubPrivateCode(@PathVariable("clubId") Long clubId) {
@@ -89,6 +89,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @ClubManager
     @Operation(summary = "모임 가입 신청 여닫기")
     @PatchMapping(value = "/{clubId}/private")
     public ResponseEntity updateClubPrivateStatus(@PathVariable("clubId") Long clubId){
