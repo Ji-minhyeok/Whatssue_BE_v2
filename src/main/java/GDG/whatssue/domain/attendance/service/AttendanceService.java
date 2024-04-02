@@ -3,6 +3,8 @@ package GDG.whatssue.domain.attendance.service;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
+import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
@@ -41,6 +43,23 @@ public class AttendanceService {
         return attendanceNumResponseDto;
     }
 
+    public List<ScheduleDto> currentAttendanceList(Long clubId) {
+        List<ScheduleDto> scheduleIdList = new ArrayList<>();
+        if (attendanceNumMap.containsKey(clubId)) {
+            for (Long scheduleId : attendanceNumMap.get(clubId).keySet()) {
+                Schedule schedule = scheduleRepository.findById(scheduleId).get();
+                ScheduleDto dto = ScheduleDto.builder()
+                        .scheduleId(schedule.getId())
+                        .scheduleName(schedule.getScheduleName())
+                        .scheduleContent(schedule.getScheduleContent())
+                        .scheduleDateTime(schedule.getScheduleDateTime())
+                        .isChecked(schedule.isChecked())
+                        .build();
+                scheduleIdList.add(dto);
+            }
+        }
+        return scheduleIdList;
+    }
     /*Delete 시에 결석자 명단을 업로드해야할까?*/
     public void deleteAttendance(Long clubId, Long scheduleId) throws Exception {
         if (attendanceNumMap.containsKey(clubId)) {

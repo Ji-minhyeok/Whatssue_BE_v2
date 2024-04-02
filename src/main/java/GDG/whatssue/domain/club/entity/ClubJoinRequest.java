@@ -1,6 +1,5 @@
 package GDG.whatssue.domain.club.entity;
 
-import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.Column;

@@ -4,7 +4,6 @@ import GDG.whatssue.global.error.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 
 @Getter
 @RequiredArgsConstructor
