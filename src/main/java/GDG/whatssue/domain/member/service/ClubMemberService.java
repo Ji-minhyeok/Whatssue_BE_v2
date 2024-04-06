@@ -4,5 +4,5 @@ public interface ClubMemberService {
 
     public boolean isClubMember(Long clubId, Long userId);
     public boolean isClubManager(Long clubId, Long userId);
-
+    public boolean isFirstVisit(Long clubId, Long userId);
 }

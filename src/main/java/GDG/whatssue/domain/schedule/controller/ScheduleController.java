@@ -4,8 +4,8 @@ import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
-import GDG.whatssue.domain.schedule.service.ScheduleService;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/clubs/{clubId}/schedules")
 public class ScheduleController {
 
-    private final ScheduleService scheduleService;
+    private final ScheduleServiceImpl scheduleService;
 
     /**
      * Filter 또는 Interceptor를 통해 schedule이 club의 것인지 체크 필요 TODO

@@ -1,10 +1,7 @@
 package GDG.whatssue.global.argumentresolver;
 
 import GDG.whatssue.domain.user.entity.KakaoDetails;
-import GDG.whatssue.global.annotation.LoginUser;
-import GDG.whatssue.global.error.CommonErrorCode;
-import GDG.whatssue.global.error.CommonException;
-import jakarta.servlet.http.HttpServletRequest;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

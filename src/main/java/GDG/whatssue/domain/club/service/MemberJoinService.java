@@ -31,6 +31,7 @@ public class MemberJoinService {
                 .club(clubJoinRequest.getClub())
                 .user(clubJoinRequest.getUser())
                 .role(Role.MEMBER) // 초기는 MEMBER 롤 설정
+                .isFirstVisit(true)
                 .build();
 
         clubMemberRepository.save(clubMember);

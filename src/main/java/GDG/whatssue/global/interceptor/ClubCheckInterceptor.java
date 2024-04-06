@@ -1,9 +1,14 @@
 package GDG.whatssue.global.interceptor;
 
+import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.*;
+import static GDG.whatssue.global.error.CommonErrorCode.*;
+
+import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -36,73 +41,70 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
 
         HandlerMethod hm = (HandlerMethod) handler;
 
-        Long userId = extractUserIdFromKakao();
-        Long clubId = extractClubIdFromRequest(request);
+        Long userId = getUserId();
+        Long clubId = getClubId(request);
 
-        if (userId == null) {
-            log.warn("Kakao Oauth에서 userId 추출 오류");
-            return false;
-        }
+        // 클럽 존재여부 체크
+        clubService.isClubExist(clubId);
 
-        if (clubId == null) {
-            log.warn("request에서 clubId 추출 오류");
-            return false;
-        }
-
-        log.info("userId: " + userId);
-
-        // 클럽 존재여부 체크 TODO
-        if (!clubService.isClubExist(clubId)) {
-            //처리 TODO
-            log.info("존재하지 않는 클럽입니다");
-            return false;
-        }
-
-        // 클럽 멤버여부 체크 TODO
+        // 클럽 멤버여부 체크
         if (!clubMemberService.isClubMember(clubId, userId)) {
-            //처리 TODO
-            log.info("멤버가 아닙니다");
-            return false;
+            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
         }
 
-        // 클럽 관리자 체크 TODO
+        // 클럽 관리자 체크
         ClubManager clubManager = hm.getMethodAnnotation(ClubManager.class);
 
-        if (clubManager == null) { //관리자 api가 아니면 true
-            return true;
+        if (clubManager != null && !clubMemberService.isClubManager(clubId, userId)) {
+            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
+        }
+        
+        //첫 로그인 여부 체크
+        if (clubMemberService.isFirstVisit(clubId, userId)) {
+            throw new CommonException(PROFILE_SETUP_REQUIRED_ERROR);
         }
 
-        if (!clubMemberService.isClubManager(clubId, userId)) {
-            log.info("관리자가 아닙니다");
-            return false;
-        }
 
+        //인터셉터 통과
         return true;
     }
 
+    private Long getClubId(HttpServletRequest request) {
+        String clubId = extractPathVariableFromRequest(request, "clubId");
 
-    //동작하는지 체크 TODO
-    private static Long extractUserIdFromKakao() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth != null || auth.getPrincipal() instanceof OAuth2User) {
-            KakaoDetails userPrincipal = (KakaoDetails) auth.getPrincipal();
-
-            return userPrincipal.getUser().getUserId();
+        try {
+            return Long.parseLong(clubId);
+        } catch (Exception e) {
+            throw new CommonException(BAD_REQUEST);
         }
-        return null;
     }
 
-    private static Long extractClubIdFromRequest(HttpServletRequest request) {
+    private Long getUserId() {
+        KakaoDetails kaKaoDetails = getKaKaoDetails();
+
+        try {
+            return kaKaoDetails.getUser().getUserId();
+        } catch (Exception e) {
+            throw new CommonException(BAD_REQUEST);
+        }
+
+        return null;
+
+    }
+
+    private String extractPathVariableFromRequest(HttpServletRequest request, String pathVariable) {
         Map<String, String> pathVariables = (Map<String, String>) request
             .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        String clubId = pathVariables.get("clubId");
+        return pathVariables.get(pathVariable);
+    }
+    private static KakaoDetails getKaKaoDetails() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (clubId == null) {
-            return null;
-        } else {
-            return Long.parseLong(clubId);
+        if (auth == null || !(auth.getPrincipal() instanceof OAuth2User)) {
+            throw new CommonException(OAUTH_ERROR);
         }
+
+        return (KakaoDetails) auth.getPrincipal();
     }
 }

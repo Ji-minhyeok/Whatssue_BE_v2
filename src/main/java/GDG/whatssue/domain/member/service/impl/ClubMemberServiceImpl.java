@@ -35,4 +35,11 @@ public class ClubMemberServiceImpl implements ClubMemberService {
             return false;
         }
     }
+
+    @Override
+    public boolean isFirstVisit(Long clubId, Long userId) {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).get();
+
+        return clubMember.isFirstVisit();
+    }
 }
