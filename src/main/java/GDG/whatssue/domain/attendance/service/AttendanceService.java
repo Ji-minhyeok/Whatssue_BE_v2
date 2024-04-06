@@ -22,7 +22,6 @@ public class AttendanceService {
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleRepository scheduleRepository;
-
     public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception {
         Random random = new Random();
         int randomInt = random.nextInt(1, 1001);
@@ -42,7 +41,7 @@ public class AttendanceService {
                 .build();
         return attendanceNumResponseDto;
     }
-
+/*현재 진행중인 일정 리스트*/
     public List<ScheduleDto> currentAttendanceList(Long clubId) {
         List<ScheduleDto> scheduleIdList = new ArrayList<>();
         if (attendanceNumMap.containsKey(clubId)) {
@@ -50,6 +49,7 @@ public class AttendanceService {
                 Schedule schedule = scheduleRepository.findById(scheduleId).get();
                 ScheduleDto dto = ScheduleDto.builder()
                         .scheduleId(schedule.getId())
+                        .clubId(schedule.getClub().getId())
                         .scheduleName(schedule.getScheduleName())
                         .scheduleContent(schedule.getScheduleContent())
                         .scheduleDateTime(schedule.getScheduleDateTime())

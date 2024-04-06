@@ -41,12 +41,10 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
-//                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
-//                        .requestMatchers(HttpMethod.DELETE,"/board/delete/{id}").hasRole("MANAGER")
-//                        .requestMatchers(HttpMethod.POST,"/board/update/list").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2->oauth2
-//                        .loginPage("/login")
+                        .defaultSuccessUrl("http://3.34.58.135:3000", true)
+//                        .failureUrl("/loginForm")
                         .userInfoEndpoint(userInfo->userInfo
                                 .userService(CustomOauth2Service))
                 )

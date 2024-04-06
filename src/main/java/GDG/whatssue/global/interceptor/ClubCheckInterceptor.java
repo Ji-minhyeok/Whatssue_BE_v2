@@ -90,7 +90,6 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
 
             return userPrincipal.getUser().getUserId();
         }
-
         return null;
     }
 
