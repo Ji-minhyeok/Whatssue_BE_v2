@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
 import java.time.LocalDateTime;
 
 @Getter
-@RedisHash(value = "PhoneCertNum", timeToLive = 120) // 문자 인증 2분으로 제한
+@RedisHash(value = "PhoneCertNum", timeToLive = 300) // 문자 인증 2분으로 제한
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

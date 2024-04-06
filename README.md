@@ -30,10 +30,9 @@
 - MySql
 
 ### Infra 
-- AWS (EC2, LB, AutoScailing) (도입 예정)
+- AWS (EC2,S3)
 - Docker
 - GithubActions
-- Nginx (도입 예정)
 
 ---
 

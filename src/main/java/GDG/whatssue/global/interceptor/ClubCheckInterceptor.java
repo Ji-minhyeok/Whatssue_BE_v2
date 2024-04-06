@@ -87,6 +87,9 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             throw new CommonException(BAD_REQUEST);
         }
+
+        return null;
+
     }
 
     private String extractPathVariableFromRequest(HttpServletRequest request, String pathVariable) {

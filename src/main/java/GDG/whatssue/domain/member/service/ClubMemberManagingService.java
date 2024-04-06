@@ -2,6 +2,8 @@ package GDG.whatssue.domain.member.service;
 
 //import GDG.whatssue.domain.member.dto.ClubJoinRequestDto;
 //import GDG.whatssue.domain.member.entity.ClubJoinRequest;
+import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
@@ -42,4 +44,6 @@ public class ClubMemberManagingService {
             throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
         }
     }
+
+
 }
