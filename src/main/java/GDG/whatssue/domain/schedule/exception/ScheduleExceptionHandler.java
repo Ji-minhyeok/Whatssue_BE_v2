@@ -1,7 +1,6 @@
 package GDG.whatssue.domain.schedule.exception;
 
 import GDG.whatssue.domain.schedule.controller.ScheduleController;
-import GDG.whatssue.global.error.ErrorCode;
 import GDG.whatssue.global.error.ErrorResult;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,7 @@ public class ScheduleExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResult> scheduleDateTimePatternExHandle(HttpMessageNotReadableException e, HttpServletRequest request) {
-        ScheduleErrorCode errorCode = ScheduleErrorCode.INVALID_SCHEDULE_DATETIME_ERROR;
+        ScheduleErrorCode errorCode = ScheduleErrorCode.INVALID_SCHEDULE_DATETIME_PATTERN_ERROR;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.name())
             .message(errorCode.getMessage())

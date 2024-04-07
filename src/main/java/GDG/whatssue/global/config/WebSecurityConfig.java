@@ -1,12 +1,11 @@
 package GDG.whatssue.global.config;
 
-import GDG.whatssue.global.auth.CustomOauth2Service;
+import GDG.whatssue.domain.user.service.CustomOauth2Service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,8 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.List;
 
 @Slf4j
 @Configuration
@@ -33,9 +30,8 @@ public class WebSecurityConfig {
             "/swagger-ui.html",
             "/v2/api-docs",
             "/webjars/**",
-            "/signUp",
-            "/api/**",
-        "/**"
+            "/signUp"
+        //,"/api/**"
     };
 
     @Bean
@@ -45,12 +41,10 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
-//                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
-//                        .requestMatchers(HttpMethod.DELETE,"/board/delete/{id}").hasRole("MANAGER")
-//                        .requestMatchers(HttpMethod.POST,"/board/update/list").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2->oauth2
-//                        .loginPage("/login")
+                        .defaultSuccessUrl("http://3.34.58.135:3000", true)
+//                        .failureUrl("/loginForm")
                         .userInfoEndpoint(userInfo->userInfo
                                 .userService(CustomOauth2Service))
                 )

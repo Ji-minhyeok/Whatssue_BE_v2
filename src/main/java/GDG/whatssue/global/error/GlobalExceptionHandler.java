@@ -31,8 +31,8 @@ public class GlobalExceptionHandler {
 
     //valid 검증 예외처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResult> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request){
-        log.warn("exception=", e.getMessage());
+    public ResponseEntity<ErrorResult> methodValidExHandle(MethodArgumentNotValidException e, HttpServletRequest request){
+        log.warn("exception= {}", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
         ErrorCode errorCode = CommonErrorCode.BAD_REQUEST;
 
@@ -61,7 +61,6 @@ public class GlobalExceptionHandler {
             .message(errorCode.getMessage())
             .path(request.getRequestURI())
             .build();
-
 
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
     }

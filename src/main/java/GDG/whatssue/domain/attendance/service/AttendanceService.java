@@ -3,6 +3,8 @@ package GDG.whatssue.domain.attendance.service;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
+import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
@@ -20,7 +22,6 @@ public class AttendanceService {
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleRepository scheduleRepository;
-
     public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception {
         Random random = new Random();
         int randomInt = random.nextInt(1, 1001);
@@ -40,7 +41,25 @@ public class AttendanceService {
                 .build();
         return attendanceNumResponseDto;
     }
-
+/*현재 진행중인 일정 리스트*/
+    public List<ScheduleDto> currentAttendanceList(Long clubId) {
+        List<ScheduleDto> scheduleIdList = new ArrayList<>();
+        if (attendanceNumMap.containsKey(clubId)) {
+            for (Long scheduleId : attendanceNumMap.get(clubId).keySet()) {
+                Schedule schedule = scheduleRepository.findById(scheduleId).get();
+                ScheduleDto dto = ScheduleDto.builder()
+                        .scheduleId(schedule.getId())
+                        .clubId(schedule.getClub().getId())
+                        .scheduleName(schedule.getScheduleName())
+                        .scheduleContent(schedule.getScheduleContent())
+                        .scheduleDateTime(schedule.getScheduleDateTime())
+                        .isChecked(schedule.isChecked())
+                        .build();
+                scheduleIdList.add(dto);
+            }
+        }
+        return scheduleIdList;
+    }
     /*Delete 시에 결석자 명단을 업로드해야할까?*/
     public void deleteAttendance(Long clubId, Long scheduleId) throws Exception {
         if (attendanceNumMap.containsKey(clubId)) {

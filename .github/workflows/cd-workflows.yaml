@@ -29,10 +29,27 @@ jobs:
           spring.datasource.url: ${{ secrets.DB_URL }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
-          spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
-          spring.jpa.properties.hibernate.ddl-auto: update
-          spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MariaDB103Dialect
+          spring.security.oauth2.client.registration.Kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+          spring.security.oauth2.client.registration.Kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          coolsms.api.number: ${{ secrets.FROMNUMBER }}
+          coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
+          coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
+          cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          cloud.aws.region.static: ap-northeast-2
+          spring.redis.data.host: ${{ secrets.REDIS_HOST }}
+          spring.redis.data.password: ${{ secrets.REDIS_PASSWORD }}
 
+      - name: Grant execute permission for gradlew
+
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
       # Login to ghcr
       - name: Login to ghcr
@@ -56,10 +73,9 @@ jobs:
         id: deploy
         if: contains(github.ref, 'main') || contains(github.ref, 'develop')
         with:
+          key: ${{secrets.SSH_PRIVATE_KEY }}
           host: ${{ secrets.DEV_SERVER_DNS }}
           username: ${{ secrets.DEV_SERVER_USER }}
-          password: ${{ secrets.DEV_SERVER_PASSWORD }}
-          port: ${{ secrets.DEV_SERVER_SSH_PORT }}
           script: |
             echo "${{ secrets.GHCR_TOKEN }}" | sudo docker login ghcr.io -u pinetree2 --password-stdin
             if [ "$(docker ps -aq -f name=whatssue-be)" ]; then

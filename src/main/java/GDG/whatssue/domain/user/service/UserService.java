@@ -21,43 +21,55 @@
 //
 //    private final UserRepository userRepository;
 //    private final PasswordEncoder passwordEncoder;
-//    public void signUp(UserDto userDto) {
-//        User user = User.builder()
-////                .userNick(userDto.getUserNick())
-////                .userPw(userDto.getUserPw())
-////                .userEmail(userDto.getUserEmail())
-//                .userName(userDto.getUserName())
-////                .userPhone(userDto.getUserPhone())
-//                .role("ROLE_USER")
-//                .build();
-//        // 비밀번호 암호화 : 비밀번호 암호화가 안되어있으면 security로 로그인을 할 수 없음.
-//        user.setUserPw(passwordEncoder.encode(user.getUserPw()));
-//        userRepository.save(user);
-//    }
-//    @Override
-//    @Transactional
-//    public UserDetails loadUserByUsername(String userName) {
-//        User user = userRepository.findByUserNick(userName);
+////    public void signUp(UserDto userDto) {
+////        User user = User.builder()
+//////                .userNick(userDto.getUserNick())
+//////                .userPw(userDto.getUserPw())
+//////                .userEmail(userDto.getUserEmail())
+////                .userName(userDto.getUserName())
+//////                .userPhone(userDto.getUserPhone())
+////                .role("ROLE_USER")
+////                .build();
+////        // 비밀번호 암호화 : 비밀번호 암호화가 안되어있으면 security로 로그인을 할 수 없음.
+////        user.setUserPw(passwordEncoder.encode(user.getUserPw()));
+////        userRepository.save(user);
+////    }
+////    @Override
+////    @Transactional
+////    public UserDetails loadUserByUsername(String userName) {
+////        User user = userRepository.findByUserNick(userName);
+////
+////        if(userRepository.findByUserNick(userName) == null)
+////            return null;
+////
+////        PrincipalDetails userDetails = new PrincipalDetails(user);
+////        System.out.println("로그인 완료");
+////        return userDetails;
+////
+////        // UserDetails가 return이 되면 시큐리티 session의 Authentication의 내부에 userDetail이 저장이 된다.
+////        // Session(내부 Authentication(내부 UserDetails))
+////    }
 //
-//        if(userRepository.findByUserNick(userName) == null)
-//            return null;
+////    public UserDto getUserInfo(PrincipalDetails principalDetails) {
+////        User user = principalDetails.getUser();
+////        return UserDto.builder()
+////                .userNick(user.getUserNick())
+////                .userPw(user.getUserPw())
+////                .userEmail(user.getUserEmail())
+////                .userName(user.getUserName())
+////                .userPhone(user.getUserPhone())
+////                .build();
+////    }
 //
-//        PrincipalDetails userDetails = new PrincipalDetails(user);
-//        System.out.println("로그인 완료");
-//        return userDetails;
-//
-//        // UserDetails가 return이 되면 시큐리티 session의 Authentication의 내부에 userDetail이 저장이 된다.
-//        // Session(내부 Authentication(내부 UserDetails))
-//    }
-//
-//    public UserDto getUserInfo(PrincipalDetails principalDetails) {
-//        User user = principalDetails.getUser();
+//    public UserDto getUserInfo(Long userId)  {
+//        User user = userRepository.findById(userId).orElseThrow(
+//                () -> new IllegalArgumentException("해당 유저가 없습니다.")
+//        );
 //        return UserDto.builder()
-//                .userNick(user.getUserNick())
-//                .userPw(user.getUserPw())
-//                .userEmail(user.getUserEmail())
+//                .userId(String.valueOf(user.getUserId()))
 //                .userName(user.getUserName())
-//                .userPhone(user.getUserPhone())
+//                .role(user.getRole())
+//                .oauth2Id(user.getOauth2Id())
 //                .build();
 //    }
 //

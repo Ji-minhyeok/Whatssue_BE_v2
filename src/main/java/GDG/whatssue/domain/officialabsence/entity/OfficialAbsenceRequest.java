@@ -12,10 +12,12 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Builder;
+import lombok.Setter;
 
 @Getter
 @Entity
 @Builder
+@Setter
 @AllArgsConstructor
 public class OfficialAbsenceRequest {
 
@@ -34,6 +36,9 @@ public class OfficialAbsenceRequest {
 
     @JoinColumn(name = "official_absence_content", nullable = false)
     private String officialAbsenceContent;
+
+    @Column(name = "is_checked")
+    private boolean isChecked;
 
     public OfficialAbsenceRequest() {
         // 기본 생성자

@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.schedule.entity;
 
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
+import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -38,7 +39,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private String scheduleName;
 
-    @Column(nullable = false)
+    @Column
     private String scheduleContent;
 
     @Column(nullable = false)
@@ -53,10 +54,10 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList;
 
-    public void update(String scheduleName, String scheduleContent, LocalDateTime scheduleDateTime) {
-        this.scheduleName = scheduleName;
-        this.scheduleContent = scheduleContent;
-        this.scheduleDateTime = scheduleDateTime;
+    public void update(ModifyScheduleRequest request) {
+        this.scheduleName = request.getScheduleName();
+        this.scheduleContent = request.getScheduleContent();
+        this.scheduleDateTime = request.getScheduleDateTime();
     }
 
 }
